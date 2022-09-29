@@ -1,7 +1,13 @@
+# This Python file uses the following encoding: utf-8
+
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.conf import settings
+from django.contrib import messages
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse,resolve
+from django.utils.translation import ugettext as _
 
 from .models import Survey, Category, Response
 from .forms import ResponseForm
@@ -98,6 +104,11 @@ class SurveyDetail(View):
 class ConfirmView(TemplateView):
     template_name = 'survey/confirm.html'
 
+    def get(self,request,uuid):
+        messages.add_message(request,messages.SUCCESS, _(u'Dziękujemy za wypełnie ankiety !'))
+        print "get"
+        return HttpResponseRedirect(reverse('home'))
+
     def get_context_data(self, **kwargs):
         context = super(ConfirmView, self).get_context_data(**kwargs)
         context['uuid'] = kwargs['uuid']
@@ -106,7 +117,7 @@ class ConfirmView(TemplateView):
 
 class SurveyCompleted(TemplateView):
     template_name = 'survey/completed.html'
-
+        
     def get_context_data(self, **kwargs):
         context = super(SurveyCompleted, self).get_context_data(**kwargs)
         survey = get_object_or_404(Survey, is_published=True, id=kwargs['id'])
